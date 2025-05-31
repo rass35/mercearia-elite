@@ -16,14 +16,12 @@
       flex-direction: column;
       align-items: center;
     }
-
     h1 {
       font-size: 2rem;
       margin-bottom: 1.2rem;
       font-weight: 700;
       text-align: center;
     }
-
     form {
       max-width: 1100px;
       width: 100%;
@@ -35,13 +33,11 @@
       flex-direction: column;
       gap: 1rem;
     }
-
     label {
       font-weight: 600;
       display: block;
       margin-bottom: 0.3rem;
     }
-
     select, input[type="date"], input[type="time"], input[type="text"], input[type="tel"], input[type="number"] {
       width: 100%;
       padding: 0.5rem 0.7rem;
@@ -51,7 +47,6 @@
       height: 2.8rem;
       box-sizing: border-box;
     }
-
     .accordion {
       background-color: #ffc107;
       color: black;
@@ -64,11 +59,9 @@
       transition: background-color 0.3s ease;
       font-size: 1.1rem;
     }
-
     .accordion:hover {
       background-color: #e0a800;
     }
-
     .panel {
       display: none;
       background-color: #fff8e1;
@@ -77,24 +70,20 @@
       margin-bottom: 1rem;
       padding: 1rem;
     }
-
     .category {
       margin-bottom: 1.5rem;
     }
-
     .category h3 {
       margin-bottom: 0.8rem;
       background: #ffd54f;
       padding: 0.5rem 1rem;
       border-radius: 8px;
     }
-
     .products-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       gap: 1rem;
     }
-
     .product-card {
       background-color: #fff;
       border: 1px solid #ddd;
@@ -102,25 +91,22 @@
       border-radius: 10px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
-
     .product-card label {
       font-weight: bold;
       margin-bottom: 0.5rem;
       display: block;
     }
-
     .total-display {
       font-weight: bold;
       font-size: 1.2rem;
       color: #28a745;
     }
-
     .buttons {
       display: flex;
       justify-content: space-between;
       gap: 1rem;
+      flex-wrap: wrap;
     }
-
     button {
       flex: 1;
       padding: 0.75rem;
@@ -132,23 +118,12 @@
       color: white;
       transition: background-color 0.3s ease;
     }
-
-    button#send {
-      background-color: #28a745;
-    }
-
-    button#send:hover {
-      background-color: #218838;
-    }
-
-    button#clear {
-      background-color: #dc3545;
-    }
-
-    button#clear:hover {
-      background-color: #c82333;
-    }
-
+    button#send { background-color: #28a745; }
+    button#send:hover { background-color: #218838; }
+    button#clear { background-color: #dc3545; }
+    button#clear:hover { background-color: #c82333; }
+    button#repeat { background-color: #007bff; }
+    button#repeat:hover { background-color: #0069d9; }
     .confirmation {
       background-color: #d4edda;
       color: #155724;
@@ -169,22 +144,18 @@
     <label for="date">Data de entrega</label>
     <input type="date" id="date" required />
   </div>
-
   <div>
     <label for="time">Horário desejado</label>
     <input type="time" id="time" required />
   </div>
-
   <div>
     <label for="name">Seu nome</label>
     <input type="text" id="name" placeholder="Seu nome completo" required />
   </div>
-
   <div>
     <label for="phone">Telefone</label>
     <input type="tel" id="phone" placeholder="(xx) xxxxx-xxxx" required />
   </div>
-
   <div>
     <label for="payment">Forma de pagamento</label>
     <select id="payment" required>
@@ -194,7 +165,6 @@
       <option value="Dinheiro">Dinheiro</option>
     </select>
   </div>
-
   <div>
     <label for="search">🔍 Buscar Produto</label>
     <input type="text" id="search" placeholder="Digite para buscar...">
@@ -210,6 +180,7 @@
   <div class="buttons">
     <button id="send">Confirmar Pedido</button>
     <button id="clear" type="button">Limpar</button>
+    <button id="repeat" type="button" style="display:none;">🔄 Repetir Último Pedido</button>
   </div>
 </form>
 
@@ -219,22 +190,20 @@
 
 <script>
 const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSxb2ltuAYB-vi1tby-ozsPbImeoG4JtaeSMXRhI36gWA31gyYMMgphNlRukoVd0ByalEKhOrI_Fnvx/pub?output=csv';
-
 let products = [];
 const productPanel = document.getElementById('productPanel');
-const whatsappNumber = '5521972654357'; // <-- Coloque seu número aqui
+const whatsappNumber = '5521972654357';
 
 fetch(sheetUrl)
   .then(response => response.text())
   .then(data => {
     const rows = data.split('\n').slice(1);
     const categories = {};
-
     rows.forEach(row => {
       const [categoria, nome, preco] = row.split(',').map(item => item.trim().replace(/"/g, ''));
       if (nome && preco) {
         if (!categories[categoria]) categories[categoria] = [];
-        categories[categoria].push({ name: nome, price: parseFloat(preco) });
+        categories[categoria].push({ name: nome, price: parseFloat(preco.replace(',', '.')) });
       }
     });
 
@@ -243,7 +212,6 @@ fetch(sheetUrl)
       const section = document.createElement('div');
       section.className = 'category';
       section.innerHTML = `<h3>${category}</h3>`;
-
       const grid = document.createElement('div');
       grid.className = 'products-grid';
 
@@ -266,6 +234,10 @@ fetch(sheetUrl)
     document.querySelectorAll('input[type="number"]').forEach(input => {
       input.addEventListener('input', updateTotalDisplay);
     });
+
+    if (localStorage.getItem('lastOrder')) {
+      document.getElementById('repeat').style.display = 'block';
+    }
   });
 
 function calculateTotal() {
@@ -331,6 +303,7 @@ Aguardo a confirmação! ✅`;
   const url = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(msg)}`;
   window.open(url, '_blank');
 
+  saveLastOrder();
   document.getElementById('confirmationMessage').style.display = 'block';
 });
 
@@ -339,6 +312,11 @@ document.getElementById('clear').addEventListener('click', () => {
   document.getElementById('confirmationMessage').style.display = 'none';
   document.querySelector('.panel').style.display = 'none';
   updateTotalDisplay();
+});
+
+document.getElementById('repeat').addEventListener('click', () => {
+  loadLastOrder();
+  document.querySelector('.panel').style.display = 'block';
 });
 
 const today = new Date().toISOString().split('T')[0];
@@ -353,6 +331,40 @@ searchInput.addEventListener('input', () => {
     card.style.display = label.includes(searchTerm) ? 'block' : 'none';
   });
 });
+
+// 🕘 Salvar último pedido
+function saveLastOrder() {
+  const order = {
+    date: document.getElementById('date').value,
+    time: document.getElementById('time').value,
+    name: document.getElementById('name').value,
+    phone: document.getElementById('phone').value,
+    payment: document.getElementById('payment').value,
+    products: products.map((p, idx) => ({
+      qty: Number(document.getElementById(`prod-${idx}`).value)
+    }))
+  };
+  localStorage.setItem('lastOrder', JSON.stringify(order));
+}
+
+// 🔄 Carregar último pedido
+function loadLastOrder() {
+  const saved = JSON.parse(localStorage.getItem('lastOrder'));
+  if (!saved) return;
+
+  document.getElementById('date').value = saved.date;
+  document.getElementById('time').value = saved.time;
+  document.getElementById('name').value = saved.name;
+  document.getElementById('phone').value = saved.phone;
+  document.getElementById('payment').value = saved.payment;
+
+  saved.products.forEach((p, idx) => {
+    const input = document.getElementById(`prod-${idx}`);
+    if (input) input.value = p.qty;
+  });
+
+  updateTotalDisplay();
+}
 </script>
 
 </body>

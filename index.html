@@ -160,6 +160,14 @@
     <input type="tel" id="phone" placeholder="(xx) xxxxx-xxxx" required />
   </div>
   <div>
+    <label for="deliveryOption">Entrega ou Retirada</label>
+    <select id="deliveryOption" required>
+      <option value="">Selecione</option>
+      <option value="Entrega">🚚 Entrega</option>
+      <option value="Retirada">🏪 Retirada na loja</option>
+    </select>
+  </div>
+  <div>
     <label for="payment">Forma de pagamento</label>
     <select id="payment" required>
       <option value="">Selecione</option>
@@ -268,6 +276,7 @@ document.getElementById('send').addEventListener('click', () => {
   const name = document.getElementById('name').value;
   const phone = document.getElementById('phone').value;
   const payment = document.getElementById('payment').value;
+  const deliveryOption = document.getElementById('deliveryOption').value;
 
   let productList = '';
   let total = 0;
@@ -281,7 +290,7 @@ document.getElementById('send').addEventListener('click', () => {
     }
   });
 
-  let deliveryFee = total >= 10 ? 0 : 3;
+  let deliveryFee = deliveryOption === 'Entrega' ? (total >= 10 ? 0 : 3) : 0;
   const totalWithDelivery = total + deliveryFee;
 
   const msg = 
@@ -290,8 +299,9 @@ document.getElementById('send').addEventListener('click', () => {
 📅 *Data de Entrega:* ${date}
 ⏰ *Horário:* ${time}
 
-👤 *Cliente:* ${name}
-📞 *Telefone:* ${phone}
+👤 *Cliente:* ${name}  
+📞 *Telefone:* ${phone}  
+📍 *Tipo:* ${deliveryOption}  
 
 🛒 *Produtos:*
 ${productList || 'Nenhum produto selecionado'}
@@ -343,6 +353,7 @@ function saveLastOrder() {
     name: document.getElementById('name').value,
     phone: document.getElementById('phone').value,
     payment: document.getElementById('payment').value,
+    deliveryOption: document.getElementById('deliveryOption').value,
     products: products.map((p, idx) => ({
       qty: Number(document.getElementById(`prod-${idx}`).value)
     }))
@@ -360,6 +371,7 @@ function loadLastOrder() {
   document.getElementById('name').value = saved.name;
   document.getElementById('phone').value = saved.phone;
   document.getElementById('payment').value = saved.payment;
+  document.getElementById('deliveryOption').value = saved.deliveryOption;
 
   saved.products.forEach((p, idx) => {
     const input = document.getElementById(`prod-${idx}`);

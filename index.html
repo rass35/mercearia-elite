@@ -222,7 +222,7 @@ fetch(sheetUrl)
     for (const [category, items] of Object.entries(categories)) {
       const section = document.createElement('div');
       section.className = 'category';
-      section.innerHTML = <h3>${category}</h3>;
+      section.innerHTML = `<h3>${category}</h3>`;
       const grid = document.createElement('div');
       grid.className = 'products-grid';
 
@@ -230,10 +230,10 @@ fetch(sheetUrl)
         products.push(p);
         const div = document.createElement('div');
         div.className = 'product-card';
-        div.innerHTML = 
+        div.innerHTML = `
           <label>${p.name} – 💰 R$${p.price.toFixed(2).replace('.', ',')}</label>
           <input type="number" min="0" value="0" id="prod-${index}">
-        ;
+        `;
         grid.appendChild(div);
         index++;
       });
@@ -254,7 +254,7 @@ fetch(sheetUrl)
 function calculateTotal() {
   let total = 0;
   products.forEach((p, idx) => {
-    const qty = Number(document.getElementById(prod-${idx}).value);
+    const qty = Number(document.getElementById(`prod-${idx}`).value);
     if (qty > 0) total += p.price * qty;
   });
   return total;
@@ -262,7 +262,7 @@ function calculateTotal() {
 
 function updateTotalDisplay() {
   const total = calculateTotal();
-  document.getElementById('totalValue').innerText = R$ ${total.toFixed(2).replace('.', ',')};
+  document.getElementById('totalValue').innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
 }
 
 document.querySelector('.accordion').addEventListener('click', () => {
@@ -282,10 +282,10 @@ document.getElementById('send').addEventListener('click', () => {
   let total = 0;
 
   products.forEach((p, idx) => {
-    const qty = Number(document.getElementById(prod-${idx}).value);
+    const qty = Number(document.getElementById(`prod-${idx}`).value);
     if (qty > 0) {
       const subtotal = p.price * qty;
-      productList += • *${p.name}* x${qty} – R$ ${subtotal.toFixed(2).replace('.', ',')}\n;
+      productList += `• *${p.name}* x${qty} – R$ ${subtotal.toFixed(2).replace('.', ',')}\n`;
       total += subtotal;
     }
   });
@@ -294,7 +294,7 @@ document.getElementById('send').addEventListener('click', () => {
   const totalWithDelivery = total + deliveryFee;
 
   const msg = 
-🛍️ *Pedido na Mercearia Elite*
+`🛍️ *Pedido na Mercearia Elite*
 
 📅 *Data:* ${date}
 ⏰ *Horário:* ${time}
@@ -311,9 +311,9 @@ ${productList || 'Nenhum produto selecionado'}
 💵 *Total Geral:* R$ ${totalWithDelivery.toFixed(2).replace('.', ',')}
 💳 *Forma de Pagamento:* ${payment}
 
-Aguardo a confirmação! ✅;
+Aguardo a confirmação! ✅`;
 
-  const url = https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(msg)};
+  const url = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(msg)}`;
   window.open(url, '_blank');
 
   saveLastOrder();
@@ -355,7 +355,7 @@ function saveLastOrder() {
     payment: document.getElementById('payment').value,
     deliveryOption: document.getElementById('deliveryOption').value,
     products: products.map((p, idx) => ({
-      qty: Number(document.getElementById(prod-${idx}).value)
+      qty: Number(document.getElementById(`prod-${idx}`).value)
     }))
   };
   localStorage.setItem('lastOrder', JSON.stringify(order));
@@ -374,7 +374,7 @@ function loadLastOrder() {
   document.getElementById('deliveryOption').value = saved.deliveryOption;
 
   saved.products.forEach((p, idx) => {
-    const input = document.getElementById(prod-${idx});
+    const input = document.getElementById(`prod-${idx}`);
     if (input) input.value = p.qty;
   });
 
